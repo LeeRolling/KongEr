@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>微信翻译克星 · 把中文变成程序</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:26px 22px 60px; font-family:"Microsoft YaHei",system-ui,sans-serif;
+         background:#0f1117; color:#e6e6e6; }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  h1 { font-size:21px; margin:0 0 6px; }
+  .sub { color:#8b93a7; font-size:13px; margin-bottom:22px; }
+  h2 { font-size:14px; color:#9fb0d0; margin:0 0 8px; font-weight:600; }
+  .sec { margin-bottom:20px; }
+  textarea { width:100%; min-height:104px; background:#161a24; color:#e6e6e6; border:1px solid #2b3346;
+             border-radius:10px; padding:12px; font-size:15px; line-height:1.6;
+             font-family:Consolas,"Microsoft YaHei",monospace; resize:vertical; }
+  textarea:focus { outline:none; border-color:#3b6ef0; }
+  .row { display:flex; gap:9px; flex-wrap:wrap; align-items:center; margin-top:12px; }
+  button { background:#232c42; color:#dfe6f5; border:1px solid #38445f; border-radius:9px;
+           padding:8px 15px; font-size:14px; cursor:pointer; transition:.15s; }
+  button:hover { background:#2e3a56; }
+  button.on { background:#3b6ef0; border-color:#3b6ef0; color:#fff; }
+  .meta { color:#7d879e; font-size:12px; margin-top:8px; line-height:1.7; }
+  .warn { background:#2a1f22; border:1px solid #5a3038; color:#f0b9c4; padding:13px 16px;
+          border-radius:11px; font-size:13px; line-height:1.85; margin-top:26px; }
+  .warn b { color:#ffd0da; }
+  .ok { color:#6ee7a0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>微信翻译克星</h1>
+  <div class="sub">把中文变成程序、表情、或隐形墨水 —— 微信自带的翻译翻不出来。</div>
+
+  <div class="sec">
+    <h2>① 原文（中文）</h2>
+    <textarea id="plain" placeholder="在这里输入中文，例如：你这操作也太菜了吧"></textarea>
+  </div>
+
+  <div class="sec">
+    <h2>② 选一种加密方式</h2>
+    <div class="row" id="modes"></div>
+    <div class="meta" id="modeDesc"></div>
+  </div>
+
+  <div class="sec">
+    <h2>③ 结果</h2>
+    <textarea id="out" placeholder="点下面【加密】"></textarea>
+    <div class="meta" id="lenInfo"></div>
+    <div class="row">
+      <button id="btnEnc">加密 →</button>
+      <button id="btnDec">← 解密</button>
+      <button id="btnCopy">复制结果</button>
+      <button id="btnUp">结果填入原文</button>
+    </div>
+  </div>
+
+  <div class="warn">
+    <b>先把边界说清楚：</b><br>
+    1. 这招只挡<b>微信自带的翻译</b>。机翻遇到非自然语言，一般是原样返回，翻不出东西。<br>
+    2. <b>挡不住 AI。</b>他要是把结果粘给 DeepSeek / ChatGPT，基本秒破。所以这是"防翻译"，不是"防破解"。<br>
+    3. <b>隐形墨水</b>用的是零宽字符，微信可能过滤或显示异常，发之前先给自己发一条试试。<br>
+    4. 全部在你本机浏览器里算，不联网、不上传任何东西。
+  </div>
+</div>
+
+<script src="cipher.js"></script>
+<script>
+var MODES = [
+  { key:'python',    name:'Python 源码', desc:'字面意义上的"把中文翻译成程序"——一段能直接跑出原话的代码。最短，推荐。' },
+  { key:'emoji',     name:'表情包',      desc:'每个字节变成两个表情。手机上看着最热闹，翻译软件完全无视。' },
+  { key:'base64',    name:'Base64',      desc:'最通用。但他用在线工具一解码就开了，属于礼貌性加密。' },
+  { key:'brainfuck', name:'脑力操 Brainfuck', desc:'最像"程序"的一种，纯符号。没用过的直接懵。缺点是很长。' },
+  { key:'invisible', name:'隐形墨水',    desc:'藏在零宽字符里，看起来是一条空消息。' }
+];
+var cur = 'python';
+
+var modeBox = document.getElementById('modes');
+for (var i = 0; i < MODES.length; i++) {
+  (function (m) {
+    var b = document.createElement('button');
+    b.textContent = m.name;
+    b.setAttribute('data-key', m.key);
+    b.onclick = function () { cur = m.key; paint(); };
+    modeBox.appendChild(b);
+  })(MODES[i]);
+}
+
+function paint() {
+  var bs = modeBox.getElementsByTagName('button');
+  for (var i = 0; i < bs.length; i++) {
+    if (bs[i].getAttribute('data-key') === cur) { bs[i].className = 'on'; } else { bs[i].className = ''; }
+  }
+  for (var j = 0; j < MODES.length; j++) {
+    if (MODES[j].key === cur) { document.getElementById('modeDesc').textContent = MODES[j].desc; }
+  }
+}
+
+function encode(text, mode) {
+  if (mode === 'base64')    { return Cipher.toBase64(text); }
+  if (mode === 'emoji')     { return Cipher.toEmoji(text); }
+  if (mode === 'python')    { return Cipher.toPython(text); }
+  if (mode === 'brainfuck') { return Cipher.toBrainfuck(text); }
+  if (mode === 'invisible') { return Cipher.toInvisible(text); }
+  return '';
+}
+
+function decode(text, mode) {
+  if (mode === 'base64')    { return Cipher.fromBase64(text); }
+  if (mode === 'emoji')     { return Cipher.fromEmoji(text); }
+  if (mode === 'python')    { return Cipher.fromPython(text); }
+  if (mode === 'brainfuck') { return Cipher.fromBrainfuck(text); }
+  if (mode === 'invisible') { return Cipher.fromInvisible(text); }
+  return '';
+}
+
+function toast(msg) {
+  var el = document.getElementById('lenInfo');
+  el.innerHTML = '<span class="ok">' + msg + '</span>';
+  setTimeout(function () { info(); }, 1600);
+}
+
+function info() {
+  var o = document.getElementById('out').value;
+  var el = document.getElementById('lenInfo');
+  if (!o) { el.textContent = ''; return; }
+  var n = Array.from(o).length;
+  var tip = (cur === 'invisible') ? '（全是看不见的字符，直接复制粘贴出去就行）' : '';
+  el.textContent = '结果长度：' + n + ' 个字符' + tip;
+}
+
+document.getElementById('btnEnc').onclick = function () {
+  var t = document.getElementById('plain').value;
+  if (!t) { return; }
+  document.getElementById('out').value = encode(t, cur);
+  info();
+};
+
+document.getElementById('btnDec').onclick = function () {
+  var t = document.getElementById('out').value;
+  if (!t) { return; }
+  try {
+    document.getElementById('plain').value = decode(t, cur);
+  } catch (e) {
+    alert('解不开：' + e.message);
+  }
+};
+
+document.getElementById('btnCopy').onclick = function () {
+  var o = document.getElementById('out');
+  if (!o.value) { return; }
+  o.select();
+  o.setSelectionRange(0, o.value.length);
+  var ok = false;
+  try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+  if (!ok && navigator.clipboard) {
+    navigator.clipboard.writeText(o.value).then(function () { toast('已复制 ✓'); },
+      function () { toast('复制失败，请手动 Ctrl+C'); });
+    return;
+  }
+  toast(ok ? '已复制 ✓' : '复制失败，请手动 Ctrl+C');
+};
+
+document.getElementById('btnUp').onclick = function () {
+  var o = document.getElementById('out').value;
+  if (o) { document.getElementById('plain').value = o; }
+};
+
+paint();
+info();
+</script>
+</body>
+</html>

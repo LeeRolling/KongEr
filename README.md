@@ -85,6 +85,7 @@
     ├── konger.js         核心逻辑：音节表 + 生成算法
     ├── pinyin-data.js    汉字 → 拼音数据（构建产物，65 KB）
     ├── EXAMPLES.md       空耳语料库
+    ├── wechat-cipher/    微信翻译克星（另一个小玩具，见文末）
     ├── APP/              安卓安装包（KongEr-x.y.z.apk）
     ├── android/          安卓工程源码 + 一键打包脚本 build-apk.ps1
     ├── .toolchain/       本地构建工具链（JDK+SDK，约 1.5G，不入库）
@@ -108,6 +109,15 @@
 
 - 拼音数据：[mozillazg/pinyin-data](https://github.com/mozillazg/pinyin-data)（MIT）
 - 灵感：中文互联网流传多年的「空耳」传统，以及 [javawz/taxx](https://github.com/javawz/taxx) 那个只留下一句 funny mud go pee 的仓库
+
+## 同仓库的其他小玩具
+
+### 微信翻译克星
+
+把中文变成程序、表情或隐形墨水，微信自带的机翻同样翻不出来。
+
+- 目录：[`wechat-cipher/`](wechat-cipher/)
+- 在线玩：https://leerolling.github.io/KongEr/wechat-cipher/
 
 ## License
 
