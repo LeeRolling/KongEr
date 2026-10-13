@@ -51,6 +51,17 @@
        $env:JAVA_HOME = "<仓库>\.toolchain\jdk"
        & "<仓库>\.toolchain\sdk\cmdline-tools\latest\bin\sdkmanager.bat" --sdk_root="<仓库>\.toolchain\sdk" "platforms;android-34" "build-tools;34.0.0"
 
+## ⚠️ 一个必须记住的坑：中文路径
+
+`aapt2` 是 C++ 工具，参数走系统 ANSI 编码，**遇到中文路径不会报错，但会静默地不打包 assets**——
+结果就是 APK 打出来了、签名也过了，装上去却是一片白屏。
+
+所以脚本会在 `%TEMP%\konger-apk-build\`（纯 ASCII）里完成全部构建，最后再把 APK 拷回 `APP\`。
+**别把这一步去掉**，也别把工程放到中文路径下直接构建。
+
+脚本最后还有一道**产物校验**：检查 APK 里有没有 `assets/index.html`、`assets/konger.js`、
+`assets/pinyin-data.js`、`classes.dex`、`resources.arsc`，缺任何一个就直接抛错，不让坏包流出去。
+
 ## 说明
 
 - 包名 `com.konger.app`，minSdk 21（Android 5.0+），targetSdk 34
