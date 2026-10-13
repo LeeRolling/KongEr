@@ -85,6 +85,9 @@
     ├── konger.js         核心逻辑：音节表 + 生成算法
     ├── pinyin-data.js    汉字 → 拼音数据（构建产物，65 KB）
     ├── EXAMPLES.md       空耳语料库
+    ├── APP/              安卓安装包（KongEr-x.y.z.apk）
+    ├── android/          安卓工程源码 + 一键打包脚本 build-apk.ps1
+    ├── .toolchain/       本地构建工具链（JDK+SDK，约 1.5G，不入库）
     ├── LICENSE           MIT
     └── README.md
 
