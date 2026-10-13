@@ -1,5 +1,10 @@
 # KongEr 生成器
 
+[![Release](https://img.shields.io/github/v/release/LeeRolling/KongEr?color=3b6ef0)](https://github.com/LeeRolling/KongEr/releases)
+[![License](https://img.shields.io/github/license/LeeRolling/KongEr?color=8ff0b8)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/LeeRolling/KongEr?color=f5c542)](https://github.com/LeeRolling/KongEr/stargazers)
+[![在线体验](https://img.shields.io/website?url=https%3A%2F%2Fleerolling.github.io%2FKongEr%2F&label=online%20demo)](https://leerolling.github.io/KongEr/)
+
 > 中文 → 英文谐音。**funny mud go pee** 那种。
 
 把中文按拼音谐音翻译成一串英文单词。微信自带的机翻遇到这种东西基本原样返回，所以对方**翻译不出来**。
