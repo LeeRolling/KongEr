@@ -40,7 +40,7 @@
     "放你妈的狗屁": "funny mud go pee",
     "你就是傻逼": "need juice sad bee",
     "你是猪吗": "knee she drew mud",
-    "关你屁事": "gwan knee pee sure",
+    "关你屁事": "gwan knee pee's",
     "你有病吧": "knee yo bing bah",
     "我爱你": "wall eye knee",
     "兄弟你太菜了": "shiong dee knee tie tsigh luh",
@@ -54,7 +54,7 @@
     "笑死我了": "show sir war luh"
   };
 
-  var EXTRA_RAW = "de:duh,the|shi:sure,she,shr|bu:boo,buh|you:yo,yoh|zai:dzai,sigh|le:luh,ler|wo:wall,war,wore|ni:need,knee,nee|ta:tar,tah|ha:hah,ha|hen:hun,hen|zhen:jen,jun|shuo:shwaw,shwar|ge:guh,gah|ma:mud,ma,mah|he:her,huh|ji:gee,jee|hao:how|ren:wren,run|dao:dow,dau|jiao:jee-ow,jow|xiao:show,shee-ow|zhe:juh,jer|zhi:juh,jer|chi:cheese,chir|shi2:x|guo:gwaw,guar|hui:way,hway|hui2:x|kuai:kwhy,kwai|shui:shway,shwey|tai:tie,tye|cai:tsigh,tsigh|dui:dway,dwee|shen:shen,shun|sheng:shung,shung|cheng:chung,chung|zhu:jew,drew|chu:chew,choo";
+  var EXTRA_RAW = "de:duh,the|shi:sure,she,'s|bu:boo,buh|you:yo,yoh|zai:dzai,sigh|le:luh,ler|wo:wall,war,wore|ni:need,knee,nee|ta:tar,tah|ha:hah,ha|hen:hun,hen|zhen:jen,jun|shuo:shwaw,shwar|ge:guh,gah|ma:mud,ma,mah|he:her,huh|ji:gee,jee|hao:how|ren:wren,run|dao:dow,dau|jiao:jee-ow,jow|xiao:show,shee-ow|zhe:juh,jer|zhi:juh,jer|chi:cheese,chir|shi2:x|guo:gwaw,guar|hui:way,hway|hui2:x|kuai:kwhy,kwai|shui:shway,shwey|tai:tie,tye|cai:tsigh,tsigh|dui:dway,dwee|shen:shen,shun|sheng:shung,shung|cheng:chung,chung|zhu:jew,drew|chu:chew,choo";
   EXTRA_RAW.split("|").forEach(function (item) {
     var i = item.indexOf(":");
     if (i < 0) { return; }
@@ -120,21 +120,28 @@
     }
 
     var words = [];
+    var prevWord = false;
     for (var i = 0; i < t.length; i++) {
       var ch = t.charAt(i);
-      if (isPunct(ch)) { words.push(ch); detail.push({ ch: ch, py: "", en: ch }); continue; }
+      if (isPunct(ch)) { words.push(ch); detail.push({ ch: ch, py: "", en: ch }); prevWord = false; continue; }
       var py = C2P[ch];
-      if (!py) { words.push(ch); detail.push({ ch: ch, py: "", en: ch }); continue; }
+      if (!py) { words.push(ch); detail.push({ ch: ch, py: "", en: ch }); prevWord = false; continue; }
       var list = SYL[py] || [fallback(py)];
+      if (!prevWord) {
+        var clipped = [];
+        for (var q = 0; q < list.length; q++) { if (list[q].charAt(0) !== "'") { clipped.push(list[q]); } }
+        if (clipped.length) { list = clipped; }
+      }
       var w = list[Math.floor(rng() * list.length) % list.length];
       words.push(w);
       detail.push({ ch: ch, py: py, en: w });
+      prevWord = true;
     }
 
     var out = "";
     for (var j = 0; j < words.length; j++) {
       var w2 = words[j];
-      if (j > 0 && !isPunct(w2) && !isPunct(words[j - 1])) { out += " "; }
+      if (j > 0 && !isPunct(w2) && !isPunct(words[j - 1]) && w2.charAt(0) !== "'") { out += " "; }
       out += w2;
     }
     out = out.replace(/\s+/g, " ").replace(/\s+([,.!?;:])/g, "$1").trim();

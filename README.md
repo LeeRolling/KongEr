@@ -18,7 +18,7 @@
 | 放你妈的狗屁 | funny mud go pee |
 | 你就是傻逼 | need juice sad bee |
 | 你是猪吗 | knee she drew mud |
-| 关你屁事 | gwan knee pee sure |
+| 关你屁事 | gwan knee pee's |
 | 你有病吧 | knee yo bing bah |
 | 你是不是有病 | knee she boo she yo bing |
 | 牛逼 | new bee |
