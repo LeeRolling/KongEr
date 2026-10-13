@@ -42,7 +42,7 @@
     "你是猪吗": "knee she drew mud",
     "关你屁事": "gwan knee pee sure",
     "你有病吧": "knee yo bing bah",
-    "我爱你": "wall may knee",
+    "我爱你": "wall eye knee",
     "兄弟你太菜了": "shiong dee knee tie tsigh luh",
     "多喝热水": "dwaw her ruh shway",
     "呵呵呵呵呵呵": "he he he he he he",

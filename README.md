@@ -24,7 +24,7 @@
 | 牛逼 | new bee |
 | 卧槽 | war tsow |
 | 笑死我了 | show sir war luh |
-| 我爱你 | wall may knee |
+| 我爱你 | wall eye knee |
 | 对不起 | dway boo chee |
 | 谢谢你 | shee-eh shee-eh knee |
 | 多喝热水 | dwaw her ruh shway |
