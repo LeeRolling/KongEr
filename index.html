@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>空耳生成器 · 中文变英文谐音</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:26px 22px 60px; background:#0f1117; color:#e6e6e6;
+         font-family:"Microsoft YaHei",system-ui,sans-serif; }
+  .wrap { max-width:900px; margin:0 auto; }
+  h1 { font-size:21px; margin:0 0 6px; }
+  .sub { color:#8b93a7; font-size:13px; margin-bottom:22px; }
+  h2 { font-size:14px; color:#9fb0d0; margin:0 0 8px; font-weight:600; }
+  .sec { margin-bottom:20px; }
+  textarea { width:100%; min-height:84px; background:#161a24; color:#e6e6e6; border:1px solid #2b3346;
+             border-radius:10px; padding:12px; font-size:16px; line-height:1.6;
+             font-family:"Microsoft YaHei",monospace; resize:vertical; }
+  textarea:focus { outline:none; border-color:#3b6ef0; }
+  .row { display:flex; gap:9px; flex-wrap:wrap; align-items:center; margin-top:12px; }
+  button { background:#232c42; color:#dfe6f5; border:1px solid #38445f; border-radius:9px;
+           padding:8px 15px; font-size:14px; cursor:pointer; transition:.15s; }
+  button:hover { background:#2e3a56; }
+  button.primary { background:#3b6ef0; border-color:#3b6ef0; color:#fff; }
+  button.primary:hover { background:#4a7bf5; }
+  .out { background:#161a24; border:1px solid #2b3346; border-radius:10px; padding:16px 18px;
+         font-size:22px; line-height:1.55; color:#8ff0b8; font-family:Georgia,"Microsoft YaHei",serif;
+         word-break:break-word; min-height:60px; }
+  .map { color:#8b93a7; font-size:13px; line-height:2.1; }
+  .chip { display:inline-block; background:#1b2130; border:1px solid #2b3346; border-radius:7px;
+          padding:2px 8px; margin:0 4px 4px 0; }
+  .chip b { color:#dfe6f5; font-weight:600; }
+  .chip i { color:#6ee7a0; font-style:normal; }
+  .warn { background:#1c2333; border:1px solid #2f3b57; color:#a9b6cf; padding:13px 16px;
+          border-radius:11px; font-size:13px; line-height:1.85; margin-top:26px; }
+  .warn b { color:#d7e2f5; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>空耳生成器</h1>
+  <div class="sub">中文 → 英文谐音。"funny mud go pee" 那种。</div>
+
+  <div class="sec">
+    <h2>① 输入中文</h2>
+    <textarea id="cn" placeholder="例如：放你妈的狗屁"></textarea>
+  </div>
+
+  <div class="sec">
+    <h2>② 常用弹药（点一下就填进去）</h2>
+    <div class="row" id="presets"></div>
+  </div>
+
+  <div class="sec">
+    <h2>③ 空耳结果</h2>
+    <div id="out" class="out">—</div>
+    <div class="row">
+      <button id="btnReroll">换一批</button>
+      <button id="btnCopy" class="primary">复制这段</button>
+    </div>
+  </div>
+
+  <div class="sec">
+    <h2>④ 逐字对照（看看每个字变成了啥）</h2>
+    <div id="map" class="map">—</div>
+  </div>
+
+  <div class="warn">
+    <b>说明：</b>按拼音谐音生成的，不保证每个音都像；点【换一批】会重挑候选词，挑到满意的再复制。<br>
+    内置了十几条经典成品（"放你妈的狗屁" → funny mud go pee），输入整句会直接命中。<br>
+    纯本地计算，不联网。汉字拼音数据来自 mozillazg/pinyin-data。
+  </div>
+</div>
+
+<script src="pinyin-data.js"></script>
+<script src="konger.js"></script>
+<script>
+var PRESETS = ["放你妈的狗屁","你就是傻逼","你是猪吗","关你屁事","你有病吧","你是不是有病",
+               "我爱你","呵呵呵呵呵呵","多喝热水","兄弟你太菜了","笑死我了","牛逼"];
+
+var elCn = document.getElementById('cn');
+var elOut = document.getElementById('out');
+var elMap = document.getElementById('map');
+var seed = 1;
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function render() {
+  var t = elCn.value.trim();
+  if (!t) { elOut.textContent = '—'; elMap.textContent = '—'; return; }
+  var r = Konger.convert(t, seed);
+  elOut.textContent = r.text;
+  var parts = [];
+  for (var i = 0; i < r.detail.length; i++) {
+    var d = r.detail[i];
+    if (!d.py) { continue; }
+    parts.push('<span class="chip"><b>' + esc(d.ch) + '</b> ' + esc(d.py) + ' <i>' + esc(d.en) + '</i></span>');
+  }
+  elMap.innerHTML = parts.join('') || '—';
+}
+
+var box = document.getElementById('presets');
+for (var i = 0; i < PRESETS.length; i++) {
+  (function (txt) {
+    var b = document.createElement('button');
+    b.textContent = txt;
+    b.onclick = function () { elCn.value = txt; seed = 1; render(); };
+    box.appendChild(b);
+  })(PRESETS[i]);
+}
+
+document.getElementById('btnReroll').onclick = function () {
+  seed = Math.floor(Math.random() * 1000000000) + 2;
+  render();
+};
+
+document.getElementById('btnCopy').onclick = function () {
+  var txt = elOut.textContent;
+  if (!txt || txt === '—') { return; }
+  var ta = document.createElement('textarea');
+  ta.value = txt;
+  document.body.appendChild(ta);
+  ta.select();
+  var ok = false;
+  try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+  document.body.removeChild(ta);
+  if (!ok && navigator.clipboard) {
+    navigator.clipboard.writeText(txt).then(function () { flash('已复制'); }, function () { flash('复制失败'); });
+    return;
+  }
+  flash(ok ? '已复制' : '复制失败，手动选中吧');
+};
+
+function flash(msg) {
+  var old = elOut.textContent;
+  elOut.textContent = msg;
+  setTimeout(function () { elOut.textContent = old; }, 900);
+}
+
+elCn.addEventListener('input', function () { seed = 1; render(); });
+render();
+</script>
+</body>
+</html>
